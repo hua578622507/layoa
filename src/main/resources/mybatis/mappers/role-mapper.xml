@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.situ.layoa.student.dao.RoleDao">
+<mapper namespace="com.situ.layoa.role.dao.RoleDao">
 	<!--主查询  -->
 	<sql id="role_select_base">
 		SELECT ROW_ID,ROLE_CODE,ROLE_NAME,ROLE_KIND,ROLE_INFO,CREATE_BY,CREATE_DATE,UPDATE_BY,UPDATE_DATE FROM TB_ROLE WHERE ACTIVE_FLAG=1
@@ -12,7 +12,60 @@
 		INSERT INTO TB_ROLE (ROLE_CODE,ROLE_NAME,ROLE_KIND,ROLE_INFO,CREATE_BY,CREATE_DATE)
 		VALUES(#{roleCode},#{roleName},#{roleKind},#{roleInfo},#{createBy},#{createDate})
 	</insert>
-
+	<!--逻辑删除角色  -->
+	<update id="delete">
+		UPDATE TB_ROLE SET ACTIVE_FLAG = 0 WHERE ROW_ID = #{rowId}
+	</update>
+	<!--通过rowId查询角色 用来进入修改页面  -->
+	<select id="get" resultType="Role">
+		<include refid="role_select_base"></include> AND ROW_ID=#{rowId}
+	</select>
+	<!--查询全部角色  -->
+	<select id="find" resultType="Role">
+		<include refid="role_select_base"></include>
+	</select>
+	<!--查询表中数据量  -->
+	<select id="getCount" resultType="java.lang.Integer">
+		SELECT COUNT(ROW_ID) FROM tb_role WHERE ACTIVE_FLAG=1
+		<if test="roleName!=null and roleName !=''">
+			AND ROLE_NAME LIKE CONCAT(CONCAT('%',#{roleName}),'%')
+		</if>
+	</select>
+	<!--分页查询  -->
+	<select id="findByPage" resultType="Role">
+		<include refid="role_select_base"/>
+		<if test="roleName!=null and roleName !=''">
+			AND ROLE_NAME LIKE CONCAT(CONCAT('%',#{roleName}),'%')
+		</if>
+		LIMIT #{firstResult},#{limit}
+	</select>
+		<!--更新 -->
+	<update id="update" parameterType="Role">
+		UPDATE TB_ROLE
+		<set>
+			<if test="roleCode!=null">
+				ROLE_CODE = #{roleCode},
+			</if>
+			<if test="roleName!=null">
+				ROLE_NAME = #{roleName},
+			</if>
+			<if test="roleKind!=null">
+				ROLE_KIND = #{roleKind},
+			</if>
+				<if test="roleInfo!=null">
+				ROLE_INFO = #{roleInfo},
+			</if>
+			<if test="updateBy!=null">
+				UPDATE_BY = #{updateBy},
+			</if>
+			<if test="updateDate!=null">
+				UPDATE_DATE = #{updateDate},
+			</if>
+		</set>
+		WHERE ROW_ID=#{rowId}
+	</update>
+	
+	
 	<!--校验角色名字唯一性-从数据库查询有没有相同的名字 -->
 	<select id="chenckName" resultType="Role">
 	<include refid="role_select_base"></include> AND ROLE_NAME = #{roleName}

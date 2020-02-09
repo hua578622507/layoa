@@ -4,8 +4,11 @@
  * @Author:Administrator   
  * @Date:2020年2月6日 下午6:56:34     
  */
-package com.situ.layoa.student.dao;
+package com.situ.layoa.role.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.situ.layoa.role.domain.Role;
@@ -19,6 +22,19 @@ public interface RoleDao {
 	// 新增角色
 	void save(Role role);
 
+	void delete(Long rowId);
+
+	Role get(Long rowId);
+
+	void update(Role role);
+
 	// 检验角色名字的唯一性
 	Role chenckName(String roleName);
+
+	List<Role> find();
+
+	Integer getCount();
+
+	List<Role> findByPage(@Param("firstResult") Integer firstResult, @Param("limit") Integer limit,@Param("roleName") String roleName);
+
 }

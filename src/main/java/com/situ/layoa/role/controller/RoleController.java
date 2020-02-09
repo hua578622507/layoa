@@ -7,15 +7,18 @@
 package com.situ.layoa.role.controller;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.situ.layoa.commons.LayResult;
 import com.situ.layoa.role.domain.Role;
 import com.situ.layoa.role.service.RoleService;
 
@@ -28,9 +31,37 @@ import com.situ.layoa.role.service.RoleService;
 public class RoleController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static final String PAGE_ROLE_INDEX = "role/role_index";
+	private static final String PAGE_ROLE_INDEX = "role/role_form";
+	private static final String PAGE_ROLE_TABLE = "role/role-table";
 	@Autowired
 	private RoleService roleService;
+
+	/**
+	 * 
+	 * @Title: goAdd
+	 * @Description:(弹出form表单)
+	 * @param modelAndView
+	 * @return
+	 */
+	@GetMapping("/goadd")
+	public ModelAndView goAdd(ModelAndView modelAndView) {
+		modelAndView.setViewName(PAGE_ROLE_INDEX);
+		return modelAndView;
+	}
+
+	/**
+	 * 
+	 * @Title: findAllRole
+	 * @Description:(用分页查询全部角色)
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	@GetMapping("/{page}/{limit}")
+	public LayResult findAllRole(@PathVariable Integer page, @PathVariable Integer limit, String roleName) {
+		// 要展示的列表数据
+		return roleService.findByPage(page, limit, roleName);
+	}
 
 	/**
 	 * 
@@ -48,6 +79,45 @@ public class RoleController implements Serializable {
 
 	/**
 	 * 
+	 * @Title: doDeleteRole
+	 * @Description:(逻辑删除动作)
+	 * @param rowId
+	 * @return
+	 */
+	@DeleteMapping("/{rowId}")
+	public Long doDeleteRole(@PathVariable Long rowId) {
+		roleService.deleteRole(rowId);
+		return 1L;
+	}
+
+	/**
+	 * 
+	 * @Title: goUpdate
+	 * @Description:(进修改页面)
+	 * @param rowId
+	 * @return
+	 */
+	@GetMapping("/{rowId}")
+	public ModelAndView goUpdate(@PathVariable Long rowId, ModelAndView modelAndView) {
+		modelAndView.addObject("htmlData", roleService.getRoleById(rowId));
+		modelAndView.setViewName(PAGE_ROLE_INDEX);
+		return modelAndView;
+	}
+
+	/**
+	 * 
+	 * @Title: doUpdate
+	 * @Description:(执行修改)
+	 * @param role
+	 * @return
+	 */
+	@PutMapping
+	public Integer doUpdate(Role role) {
+		return roleService.updateRole(role);
+	}
+
+	/**
+	 * 
 	 * @Title: goIndex
 	 * @Description:(进首页)
 	 * @param modelAndView
@@ -55,7 +125,7 @@ public class RoleController implements Serializable {
 	 */
 	@GetMapping
 	public ModelAndView goIndex(ModelAndView modelAndView) {
-		modelAndView.setViewName(PAGE_ROLE_INDEX);
+		modelAndView.setViewName(PAGE_ROLE_TABLE);
 		return modelAndView;
 	}
 
@@ -70,4 +140,5 @@ public class RoleController implements Serializable {
 	public Integer chenckName(String roleName) {
 		return roleService.checkName(roleName);
 	}
+
 }

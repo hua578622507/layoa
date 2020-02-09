@@ -8,6 +8,7 @@ package com.situ.layoa.role.service;
 
 import java.io.Serializable;
 
+import com.situ.layoa.commons.LayResult;
 import com.situ.layoa.role.domain.Role;
 
 /**
@@ -16,6 +17,17 @@ import com.situ.layoa.role.domain.Role;
  */
 public interface RoleService extends Serializable {
 	void saveRole(Role role);
-	
+
+	void deleteRole(Long rowId);
+
+	Role getRoleById(Long rowId);
+
+	Integer updateRole(Role role);
+
 	Integer checkName(String roleName);
+
+	Integer getCount();
+
+	LayResult findByPage(Integer page, Integer limit, String roleName);
+
 }
