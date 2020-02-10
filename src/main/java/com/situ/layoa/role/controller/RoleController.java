@@ -24,7 +24,7 @@ import com.situ.layoa.role.service.RoleService;
 
 /**
  * @ClassName:RoleController
- * @Description:(这里用一句话描述这个类的作用)
+ * @Description:(角色的controller层)
  */
 @RestController
 @RequestMapping("/role")
@@ -53,14 +53,15 @@ public class RoleController implements Serializable {
 	 * 
 	 * @Title: findAllRole
 	 * @Description:(用分页查询全部角色)
-	 * @param page
-	 * @param limit
+	 * @param page 页号
+	 * @param limit 每页显示的数据量
+	 * @param searchRole 查询的条件
 	 * @return
 	 */
 	@GetMapping("/{page}/{limit}")
-	public LayResult findAllRole(@PathVariable Integer page, @PathVariable Integer limit, String roleName) {
-		// 要展示的列表数据
-		return roleService.findByPage(page, limit, roleName);
+	public LayResult findAllRole(@PathVariable Integer page, @PathVariable Integer limit, Role searchRole) {
+		System.out.println("这是controller层的：searchRole："+searchRole);
+		return roleService.findByPage(page, limit, searchRole);
 	}
 
 	/**
@@ -98,10 +99,8 @@ public class RoleController implements Serializable {
 	 * @return
 	 */
 	@GetMapping("/{rowId}")
-	public ModelAndView goUpdate(@PathVariable Long rowId, ModelAndView modelAndView) {
-		modelAndView.addObject("htmlData", roleService.getRoleById(rowId));
-		modelAndView.setViewName(PAGE_ROLE_INDEX);
-		return modelAndView;
+	public Role goUpdate(@PathVariable Long rowId) {
+		return roleService.getRoleById(rowId);
 	}
 
 	/**

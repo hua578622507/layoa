@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import com.situ.layoa.commons.Pagination;
 import com.situ.layoa.role.domain.Role;
 
 /**
@@ -33,8 +34,8 @@ public interface RoleDao {
 
 	List<Role> find();
 
-	Integer getCount();
+	Integer getCount(@Param("searchParm") Role searchParm);
 
-	List<Role> findByPage(@Param("firstResult") Integer firstResult, @Param("limit") Integer limit,@Param("roleName") String roleName);
+	List<Role> findByPage(@Param("pagination") Pagination pagination, @Param("searchParm") Role searchParm);
 
 }

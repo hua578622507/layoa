@@ -13,6 +13,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.situ.layoa.commons.DAOUtils;
 import com.situ.layoa.commons.LayResult;
 import com.situ.layoa.role.dao.RoleDao;
 import com.situ.layoa.role.domain.Role;
@@ -45,7 +46,7 @@ public class RoleServiceImpl implements RoleService, Serializable {
 
 	/**
 	 * @Title: checkName
-	 * @Description:(这里用一句话描述这个方法的作用)
+	 * @Description:(检测名字唯一性)
 	 * @param roleName
 	 * @return
 	 */
@@ -57,17 +58,6 @@ public class RoleServiceImpl implements RoleService, Serializable {
 			result = 0;
 		}
 		return result;
-	}
-
-
-	/**
-	 * @Title: getCount
-	 * @Description:(这里用一句话描述这个方法的作用)
-	 * @return
-	 */
-	@Override
-	public Integer getCount() {
-		return roleDao.getCount();
 	}
 
 	/**
@@ -86,6 +76,16 @@ public class RoleServiceImpl implements RoleService, Serializable {
 	}
 
 	/**
+	 * @Title: getCount
+	 * @Description:(查询出数据的总量)
+	 * @return
+	 */
+//	@Override
+//	public Integer getCount(Role searchRole) {
+//		return roleDao.getCount(searchRole);
+//	}
+
+	/**
 	 * @Title: findByPage
 	 * @Description:(通过分页查询数据)
 	 * @param page  分页
@@ -94,26 +94,29 @@ public class RoleServiceImpl implements RoleService, Serializable {
 	 * @return
 	 */
 	@Override
-	public LayResult findByPage(Integer page, Integer limit, String roleName) {
-		// 查询出数据总数
-		Integer count = roleDao.getCount();
-		// limit查询数据开始的下标
-		Integer firstResult = (page - 1) * limit;
-		List<Role> roleList = roleDao.findByPage(firstResult, limit, roleName);
+	public LayResult findByPage(Integer page, Integer limit, Role searchRole) {
+		System.out.println("这是RoleServiceImpl层的：searchRole：" + searchRole);
+		// 通过反射机制将类的实例中的‘’重新赋值为null，方便MyBatis中多条件查询SQL语句的拼写
+		Role searchParm = DAOUtils.buildSearchParam(searchRole);
+		System.out.println("这是RoleServiceImpl层的：searchParm：" + searchParm);
+		// 查询出符合条件的一共有多少条数据
+		Integer count = roleDao.getCount(searchParm);
+		// 根据分页的请求信息查询出数量列表
+		List<Role> roleList = roleDao.findByPage(DAOUtils.buildPagination(page, limit), searchParm);
 		return new LayResult(0, "", count, roleList);
 	}
 
 	/**
 	 * @Title: updateRole
-	 * @Description:(这里用一句话描述这个方法的作用)
+	 * @Description:(更新数据操作)
 	 * @param role
 	 * @return
 	 */
 	@Override
 	public Integer updateRole(Role role) {
-		role.setUpdateBy(role.getRoleName());
-		role.setUpdateDate(new Date());
-		roleDao.update(role);
+		Long rowId = role.getRowId();
+		Role updateRole = roleDao.get(rowId);
+		roleDao.update(DAOUtils.buildEditData(updateRole, role));
 		return 1;
 	}
 
